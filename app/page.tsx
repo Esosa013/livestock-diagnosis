@@ -15,15 +15,12 @@ import { FaCircle, FaRegQuestionCircle } from "react-icons/fa";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Symptom } from '@/types';
 
-
-
 export default function LivestockDiagnosisApp() {
-  // Severity Icons with Tooltips
   const severityIcons: Record<"mild" | "moderate" | "severe", ReactNode> = {
     mild: (
       <Tooltip>
         <TooltipTrigger>
-          <FaCircle className="text-green-400" />
+          <FaCircle className="text-green-500" />
         </TooltipTrigger>
         <TooltipContent>Mild Severity</TooltipContent>
       </Tooltip>
@@ -31,7 +28,7 @@ export default function LivestockDiagnosisApp() {
     moderate: (
       <Tooltip>
         <TooltipTrigger>
-          <FaCircle className="text-yellow-400" />
+          <FaCircle className="text-yellow-500" />
         </TooltipTrigger>
         <TooltipContent>Moderate Severity</TooltipContent>
       </Tooltip>
@@ -93,7 +90,7 @@ export default function LivestockDiagnosisApp() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="min-h-screen bg-gray-900 text-gray-100 p-4 sm:p-8"
+        className="min-h-screen bg-gray-50 text-gray-800 p-4 sm:p-8"
       >
         <div className="container mx-auto max-w-6xl">
           <header className="text-center mb-12 relative">
@@ -103,12 +100,12 @@ export default function LivestockDiagnosisApp() {
               transition={{ duration: 0.5 }}
               className="absolute -top-12 left-1/2 transform -translate-x-1/2"
             >
-              <Stethoscope className="h-24 w-24 text-emerald-500" />
+              <Stethoscope className="h-24 w-24 text-green-600" />
             </motion.div>
-            <h1 className="text-4xl font-extrabold text-emerald-300 mb-4 tracking-tight">
+            <h1 className="text-4xl font-extrabold text-green-700 mb-4 tracking-tight">
               Livestock Health Diagnostic System
             </h1>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <p className="text-gray-600 max-w-2xl mx-auto">
               Comprehensive symptom analysis for accurate livestock disease identification
             </p>
           </header>
@@ -117,16 +114,16 @@ export default function LivestockDiagnosisApp() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="mb-10 bg-gray-800/60 backdrop-blur-xl rounded-xl p-6 border border-emerald-500/30 shadow-2xl"
+            className="mb-10 bg-white rounded-xl p-6 border border-green-200 shadow-lg"
           >
             <div className="relative mb-4 flex items-center space-x-2">
               <div className="flex-grow relative">
-                <Search className="absolute left-3 top-3 h-5 w-5 text-emerald-500" />
+                <Search className="absolute left-3 top-3 h-5 w-5 text-green-500" />
                 <Input
                   placeholder="Search symptoms..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-gray-700/50 border-emerald-500/30 text-gray-100 placeholder-emerald-500/50 focus:ring-emerald-500"
+                  className="pl-10 bg-gray-50 border-green-200 text-gray-800 placeholder-green-300 focus:ring-green-500"
                 />
               </div>
               <Tooltip>
@@ -135,7 +132,7 @@ export default function LivestockDiagnosisApp() {
                     variant="outline" 
                     size="icon" 
                     onClick={clearAllSymptoms}
-                    className="text-emerald-500 hover:bg-emerald-500/10"
+                    className="text-green-600 hover:bg-green-50 border-green-200"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -148,7 +145,7 @@ export default function LivestockDiagnosisApp() {
                     variant="outline" 
                     size="icon" 
                     onClick={() => setShowDetailedSymptoms(!showDetailedSymptoms)}
-                    className="text-emerald-500 hover:bg-emerald-500/10"
+                    className="text-green-600 hover:bg-green-50 border-green-200"
                   >
                     <HelpCircle className="h-4 w-4" />
                   </Button>
@@ -158,21 +155,20 @@ export default function LivestockDiagnosisApp() {
             </div>
             <Progress 
               value={(selectedSymptoms.length / symptoms.length) * 100} 
-              className="h-2 bg-gray-700"
+              className="h-2 bg-gray-100"
             />
-            <p className="text-sm text-emerald-300 mt-2 text-center">
+            <p className="text-sm text-green-600 mt-2 text-center">
               {selectedSymptoms.length} of {symptoms.length} symptoms selected
             </p>
           </motion.div>
 
-          {/* Symptoms Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {Object.entries(symptomsByCategory).map(([category, categorySymptoms]) => (
               <Card 
                 key={category} 
-                className="bg-gray-800/50 backdrop-blur-lg border border-emerald-500/20 rounded-xl p-6 shadow-2xl"
+                className="bg-white border border-green-100 rounded-xl p-6 shadow-md"
               >
-                <h2 className="text-xl font-semibold capitalize mb-4 text-emerald-400">
+                <h2 className="text-xl font-semibold capitalize mb-4 text-green-700">
                   {category} Symptoms
                 </h2>
                 <div className="space-y-3">
@@ -182,17 +178,17 @@ export default function LivestockDiagnosisApp() {
                         id={symptom.id}
                         checked={selectedSymptoms.includes(symptom.id)}
                         onCheckedChange={(checked) => handleSymptomToggle(symptom.id, !!checked)}
-                        className="border-emerald-500 data-[state=checked]:bg-emerald-500"
+                        className="border-green-400 data-[state=checked]:bg-green-600"
                       />
                       <label
                         htmlFor={symptom.id}
-                        className="text-sm font-medium text-gray-300 hover:text-emerald-300 transition-colors flex items-center"
+                        className="text-sm font-medium text-gray-700 hover:text-green-700 transition-colors flex items-center"
                       >
                         {symptom.name}
                         {showDetailedSymptoms && symptom.description && (
                           <Tooltip>
                             <TooltipTrigger>
-                              <FaRegQuestionCircle className="ml-2 text-emerald-500" />
+                              <FaRegQuestionCircle className="ml-2 text-green-500" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
                               {symptom.description}
@@ -218,38 +214,37 @@ export default function LivestockDiagnosisApp() {
               >
                 {isLoading ? (
                   <div className="flex justify-center items-center">
-                    <RefreshCw className="h-8 w-8 text-emerald-500 animate-spin" />
+                    <RefreshCw className="h-8 w-8 text-green-600 animate-spin" />
                   </div>
                 ) : diagnosis.disease ? (
-                  <Card className="bg-gray-800/50 backdrop-blur-lg border border-emerald-500/20 rounded-xl p-8 shadow-2xl">
+                  <Card className="bg-white border border-green-100 rounded-xl p-8 shadow-md">
                     <div className="flex flex-col md:flex-row items-start gap-8">
                       <div className="flex-1">
-                        <h2 className="text-3xl font-bold text-emerald-400 mb-4">
+                        <h2 className="text-3xl font-bold text-green-700 mb-4">
                           {diagnosis.disease.name}
                         </h2>
-                        <p className="text-emerald-200 mb-4 text-sm">
+                        <p className="text-green-600 mb-4 text-sm">
                           Match Confidence: {diagnosis.matchPercentage.toFixed(1)}%
                         </p>
                         <div className="flex items-center gap-2 mb-2">
-                          <p className="text-gray-300 mr-2">Severity:</p>
                           <div className="flex space-x-1">
                             {Object.keys(severityIcons).map((level) => (
                               <span 
                                 key={level} 
-                                className={diagnosis.disease?.severity === level ? "" : "opacity-10"}
+                                className={diagnosis.disease?.severity === level ? "" : "opacity-20"}
                               >
                                 {severityIcons[level as "mild" | "moderate" | "severe"]}
                               </span>
                             ))}
                           </div>
                         </div>
-                        <p className="text-gray-300 mb-6">{diagnosis.disease.description}</p>
+                        <p className="text-gray-700 mb-6">{diagnosis.disease.description}</p>
                         <div className="mb-6">
-                          <h3 className="font-semibold mb-3 text-emerald-400">Recommendations:</h3>
-                          <ul className="space-y-2 text-gray-300">
+                          <h3 className="font-semibold mb-3 text-green-700">Recommendations:</h3>
+                          <ul className="space-y-2 text-gray-700">
                             {diagnosis.disease.recommendations.map((rec, index) => (
                               <li key={index} className="flex items-start">
-                                <span className="text-emerald-500 mr-2">▸</span>
+                                <span className="text-green-600 mr-2">▸</span>
                                 {rec}
                               </li>
                             ))}
@@ -260,7 +255,7 @@ export default function LivestockDiagnosisApp() {
                         <img
                           src={diagnosis.disease.imageUrl}
                           alt={diagnosis.disease.name}
-                          className="w-64 h-64 object-cover rounded-xl border-4 border-emerald-500/30"
+                          className="w-64 h-64 object-cover rounded-xl border-4 border-green-100"
                         />
                       </div>
                     </div>
@@ -268,22 +263,22 @@ export default function LivestockDiagnosisApp() {
                 ) : (
                   <Alert 
                     variant="destructive" 
-                    className="bg-gray-800/50 backdrop-blur-lg border border-red-500/20 rounded-xl"
+                    className="bg-white border border-red-200 rounded-xl"
                   >
                     <AlertTriangle className="h-5 w-5 text-red-500" />
-                    <AlertTitle className="text-red-400">No Definitive Diagnosis</AlertTitle>
-                    <AlertDescription className="text-gray-300">
+                    <AlertTitle className="text-red-600">No Definitive Diagnosis</AlertTitle>
+                    <AlertDescription className="text-gray-700">
                       Based on the selected symptoms, we cannot provide a definitive diagnosis.
                       Please consult a veterinarian for professional medical advice.
                       {diagnosis.alternativeDiseases.length > 0 && (
                         <div className="mt-4">
-                          <p className="font-semibold text-emerald-400 mb-2">
+                          <p className="font-semibold text-green-700 mb-2">
                             Possible conditions to discuss:
                           </p>
-                          <ul className="space-y-1 text-gray-300">
+                          <ul className="space-y-1 text-gray-700">
                             {diagnosis.alternativeDiseases.map(disease => (
                               <li key={disease.id} className="flex items-start">
-                                <span className="text-emerald-500 mr-2">▸</span>
+                                <span className="text-green-600 mr-2">▸</span>
                                 {disease.name}
                               </li>
                             ))}
