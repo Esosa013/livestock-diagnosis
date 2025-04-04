@@ -1,7 +1,7 @@
 "use client";
 
-import { ReactNode, useState, useCallback, useMemo } from 'react';
-import { Search, AlertTriangle, Stethoscope, X, RefreshCw, HelpCircle } from 'lucide-react';
+import { ReactNode, useState, useCallback, useMemo, useEffect } from 'react';
+import { Search, AlertTriangle, Stethoscope, X, RefreshCw, HelpCircle, History, LogOut, User } from 'lucide-react';
 import { symptoms } from '@/data/symptoms';
 import { diagnoseDisease } from '@/lib/diagnosis';
 import { Card } from '@/components/ui/card';
@@ -11,11 +11,25 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu";
 import { FaCircle, FaRegQuestionCircle } from "react-icons/fa";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Symptom } from '@/types';
+import { useAuth, DiagnosisSearch } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function LivestockDiagnosisApp() {
+  const router = useRouter();
+  const { user, signOut, saveSearch, recentSearches } = useAuth();
+  
   const severityIcons: Record<"mild" | "moderate" | "severe", ReactNode> = {
     mild: (
       <Tooltip>
@@ -55,6 +69,26 @@ export default function LivestockDiagnosisApp() {
     return result;
   }, [selectedSymptoms]);
 
+  // Save diagnosis to recent searches when a new diagnosis is made
+  useEffect(() => {
+    const saveCurrentSearch = async () => {
+      if (user && selectedSymptoms.length > 0 && !isLoading) {
+        const searchData: DiagnosisSearch = {
+          id: uuidv4(),
+          timestamp: Date.now(),
+          selectedSymptoms,
+          diagnosisResult: diagnosis
+        };
+        
+        await saveSearch(searchData);
+      }
+    };
+    
+    if (!isLoading && selectedSymptoms.length > 0) {
+      saveCurrentSearch();
+    }
+  }, [diagnosis, selectedSymptoms, user, isLoading, saveSearch]);
+
   const handleSymptomToggle = useCallback((symptomId: string, checked: boolean) => {
     setSelectedSymptoms(prev => 
       checked 
@@ -66,6 +100,10 @@ export default function LivestockDiagnosisApp() {
   const clearAllSymptoms = () => {
     setSelectedSymptoms([]);
     setSearchTerm('');
+  };
+
+  const loadSavedSearch = (search: DiagnosisSearch) => {
+    setSelectedSymptoms(search.selectedSymptoms);
   };
 
   const filteredSymptoms = useMemo(() => 
@@ -84,6 +122,11 @@ export default function LivestockDiagnosisApp() {
     }, {} as Record<string, Symptom[]>)
   , [filteredSymptoms]);
 
+  const handleLogout = async () => {
+    await signOut();
+    router.push('/login');
+  };
+
   return (
     <TooltipProvider>
       <motion.div 
@@ -93,21 +136,59 @@ export default function LivestockDiagnosisApp() {
         className="min-h-screen bg-gray-50 text-gray-800 p-4 sm:p-8"
       >
         <div className="container mx-auto max-w-6xl">
-          <header className="text-center mb-12 relative">
-            <motion.div 
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 0.1 }}
-              transition={{ duration: 0.5 }}
-              className="absolute -top-12 left-1/2 transform -translate-x-1/2"
-            >
-              <Stethoscope className="h-24 w-24 text-green-600" />
-            </motion.div>
-            <h1 className="text-4xl font-extrabold text-green-700 mb-4 tracking-tight">
-              Livestock Health Diagnostic System
-            </h1>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Comprehensive symptom analysis for accurate livestock disease identification
-            </p>
+          <header className="flex justify-between items-center mb-12 relative">
+            <div className="text-center flex-grow">
+              <motion.div 
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.1 }}
+                transition={{ duration: 0.5 }}
+                className="absolute -top-12 left-1/2 transform -translate-x-1/2"
+              >
+                <Stethoscope className="h-24 w-24 text-green-600" />
+              </motion.div>
+              <h1 className="text-4xl font-extrabold text-green-700 mb-4 tracking-tight">
+                Livestock Health Diagnostic System
+              </h1>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Comprehensive symptom analysis for accurate livestock disease identification
+              </p>
+            </div>
+            
+            {user ? (
+              <div className="flex-shrink-0">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50"
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="hidden md:inline">Account</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-2 py-1.5 text-sm font-medium text-green-700">
+                      {user.email}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="text-red-600 cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <Button 
+                onClick={() => router.push('/login')}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Sign In
+              </Button>
+            )}
           </header>
 
           <motion.div 
@@ -126,6 +207,57 @@ export default function LivestockDiagnosisApp() {
                   className="pl-10 bg-gray-50 border-green-200 text-gray-800 placeholder-green-300 focus:ring-green-500"
                 />
               </div>
+              
+              {user && recentSearches.length > 0 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="text-green-600 hover:bg-green-50 border-green-200"
+                        >
+                          <History className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-64 max-h-80 overflow-y-auto">
+                        <div className="px-2 py-1.5 text-sm font-medium text-green-700">
+                          Recent Searches
+                        </div>
+                        <DropdownMenuSeparator />
+                        {recentSearches.map((search) => {
+                          const diagnosisName = search.diagnosisResult.disease 
+                            ? search.diagnosisResult.disease.name 
+                            : "No definitive diagnosis";
+                          
+                          return (
+                            <DropdownMenuItem 
+                              key={search.id}
+                              onClick={() => loadSavedSearch(search)}
+                              className="cursor-pointer"
+                            >
+                              <div className="flex flex-col w-full">
+                                <div className="flex justify-between items-center w-full">
+                                  <span className="font-medium">{diagnosisName}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {format(new Date(search.timestamp), 'MM/dd/yy')}
+                                  </span>
+                                </div>
+                                <span className="text-xs text-gray-500 truncate">
+                                  {search.selectedSymptoms.length} symptoms selected
+                                </span>
+                              </div>
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TooltipTrigger>
+                  <TooltipContent>View Search History</TooltipContent>
+                </Tooltip>
+              )}
+              
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
@@ -139,6 +271,7 @@ export default function LivestockDiagnosisApp() {
                 </TooltipTrigger>
                 <TooltipContent>Clear All Symptoms</TooltipContent>
               </Tooltip>
+              
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
@@ -152,7 +285,7 @@ export default function LivestockDiagnosisApp() {
                 </TooltipTrigger>
                 <TooltipContent>Show Detailed Symptom Information</TooltipContent>
               </Tooltip>
-            </div>
+              </div>
             <Progress 
               value={(selectedSymptoms.length / symptoms.length) * 100} 
               className="h-2 bg-gray-100"
