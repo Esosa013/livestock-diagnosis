@@ -59,7 +59,7 @@ export default function LoginPage() {
             <Stethoscope className="h-20 w-20 text-green-600 absolute top-0 left-0" />
           </motion.div>
           <h1 className="text-3xl font-extrabold text-green-700 mt-4">
-            Livestock Health Diagnostic
+            Inference System For Livestock Diseases
           </h1>
           <p className="text-gray-600 mt-2">Sign in to access your account</p>
         </div>
